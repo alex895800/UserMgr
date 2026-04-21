@@ -1,6 +1,7 @@
 package it.alex89.usermgr.excp;
 
 public class ValidationException extends Exception {
+
     public ValidationException() {
         super();
     }

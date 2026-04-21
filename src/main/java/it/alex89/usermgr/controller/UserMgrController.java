@@ -1,6 +1,7 @@
 package it.alex89.usermgr.controller;
 
 import it.alex89.usermgr.model.User;
+import it.alex89.usermgr.model.UserEdit;
 import it.alex89.usermgr.model.UserFilter;
 import it.alex89.usermgr.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,8 @@ public class UserMgrController {
     }
 
     @PutMapping("/{id}")
-    private User editUser(@RequestBody User newUser, @PathVariable String id) throws Exception {
-        return usersService.editUser(id, newUser);
+    private User editUser(@RequestBody UserEdit editUser, @PathVariable String id) throws Exception {
+        return usersService.editUser(id, editUser);
     }
 
     @PutMapping("/{id}/role")

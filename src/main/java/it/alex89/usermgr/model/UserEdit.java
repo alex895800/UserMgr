@@ -2,43 +2,23 @@ package it.alex89.usermgr.model;
 
 import java.util.List;
 
-public class User {
-    private String id;
-    private String email;
+public class UserEdit {
     private String username;
     private String name;
     private String surname;
     private String taxcode;
     private List<String> roles;
 
-    public User() {
+    public UserEdit() {
 
     }
 
-    public User(String id, String email, String username, String name, String surname, String taxcode, List<String> roles) {
-        this.id = id;
-        this.email = email;
+    public UserEdit(String username, String name, String surname, String taxcode, List<String> roles) {
         this.username = username;
         this.name = name;
         this.surname = surname;
         this.taxcode = taxcode;
         this.roles = roles;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getUsername() {

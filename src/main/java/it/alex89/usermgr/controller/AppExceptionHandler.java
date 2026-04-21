@@ -2,6 +2,7 @@ package it.alex89.usermgr.controller;
 
 import it.alex89.usermgr.excp.AlreadyCreatedException;
 import it.alex89.usermgr.excp.NotFoundException;
+import it.alex89.usermgr.excp.ValidationException;
 import it.alex89.usermgr.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,6 +21,12 @@ public class AppExceptionHandler {
     @ExceptionHandler(AlreadyCreatedException.class)
     public ErrorResponse handleAlreadyCreatedException(AlreadyCreatedException e) {
         return new ErrorResponse("CONFLICT", e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ValidationException.class)
+    public ErrorResponse handleValidationException(ValidationException e) {
+        return new ErrorResponse("BAD_REQUEST", e.getMessage());
     }
 
 }

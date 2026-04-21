@@ -23,4 +23,6 @@ public interface UsersRepository extends JpaRepository<UsersEntity, String> {
             @Param("surname") String surname,
             @Param("taxcode") String taxcode
     );
+
+
 }
