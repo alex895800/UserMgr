@@ -1,7 +1,10 @@
 package it.alex89.usermgr.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
     private String id;
     private String email;

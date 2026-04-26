@@ -12,9 +12,14 @@ import it.alex89.usermgr.model.UserFilter;
 import it.alex89.usermgr.repository.RolesRepository;
 import it.alex89.usermgr.repository.RolesTypeRepository;
 import it.alex89.usermgr.repository.UsersRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +33,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class UsersService {
+    private static final Logger logger = LoggerFactory.getLogger(UsersService.class);
+
     private static final String EMAIL_REGEX =
             "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
     private static final Pattern PATTERN = Pattern.compile(EMAIL_REGEX);
@@ -35,12 +42,12 @@ public class UsersService {
     @Autowired
     private UsersRepository usersRepository;
     @Autowired
-    private RolesRepository rolesRepository;
-    @Autowired
     private RolesTypeRepository rolesTypeRepository;
 
     @Transactional
-    public User insertUser(User user) throws Exception {
+    public User insertUser(User user, String username, String userrole) throws Exception {
+        logger.info("Start insert user operation by username {} with role {}", username, userrole);
+
         if(isFieldUserEmpty(user)){
             throw new ValidationException("The all or part of fields are empty");
         }
@@ -53,7 +60,8 @@ public class UsersService {
                         null,
                         null,
                         null,
-                        null);
+                        null,
+                null);
 
         if(users == null || users.isEmpty()){
             UsersEntity usersEntity = new UsersEntity();
@@ -63,7 +71,7 @@ public class UsersService {
             usersEntity.setSurname(user.getSurname());
             usersEntity.setTaxCode(user.getTaxcode());
             usersEntity.setDateLastUpdate(new Date());
-            usersEntity.setUserIdLastUpdate("SYSTEM");
+            usersEntity.setUserIdLastUpdate(username);
 
             if (user.getRoles() != null && !user.getRoles().isEmpty()) {
                 for (String roleName : user.getRoles()) {
@@ -79,30 +87,35 @@ public class UsersService {
             }
 
             UsersEntity usersSaved = usersRepository.save(usersEntity);
-            return convertFromEntityToObject(usersSaved);
+
+            logger.info("Finish insert user operation by username {} with role {}", username, userrole);
+
+            return convertFromEntityToId(usersSaved);
         }else{
             throw new AlreadyCreatedException("User with email: " + user.getEmail() + " already inserted");
         }
     }
 
     @Transactional
-    public User editUser(String id, UserEdit user) throws Exception {
-        if(isFieldEditUserEmpty(user)){
-            throw new ValidationException("The all or part of fields are empty");
-        }
+    public User editUser(String id, UserEdit user, String username, String userrole) throws Exception {
+        logger.info("Start update user operation by username {} with role {}", username, userrole);
 
         UsersEntity usersEntity = usersRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
 
-        usersEntity.setUsername(user.getUsername());
-        usersEntity.setName(user.getName());
-        usersEntity.setSurname(user.getSurname());
-        usersEntity.setTaxCode(user.getTaxcode());
+        if(!StringUtils.isEmpty(user.getUsername()))
+            usersEntity.setUsername(user.getUsername());
+        if(!StringUtils.isEmpty(user.getName()))
+            usersEntity.setName(user.getName());
+        if(!StringUtils.isEmpty(user.getSurname()))
+            usersEntity.setSurname(user.getSurname());
+        if(!StringUtils.isEmpty(user.getTaxcode()))
+            usersEntity.setTaxCode(user.getTaxcode());
         usersEntity.setDateLastUpdate(new Date());
-        usersEntity.setUserIdLastUpdate("SYSTEM");
+        usersEntity.setUserIdLastUpdate(username);
 
+        usersEntity.getRoles().clear();
         if (user.getRoles() != null && !user.getRoles().isEmpty()) {
-            usersEntity.getRoles().clear();
             for (String roleName : user.getRoles()) {
                 RoleTypeEntity role = rolesTypeRepository.findById(roleName)
                         .orElseThrow(() -> new ValidationException("User with email: " + usersEntity.getEmail()
@@ -116,69 +129,101 @@ public class UsersService {
         }
 
         UsersEntity usersSaved = usersRepository.save(usersEntity);
-        return convertFromEntityToObject(usersSaved);
+
+        logger.info("Finish update user operation by username {} with role {}", username, userrole);
+
+        return convertFromEntityToObject(usersSaved, userrole);
     }
 
     @Transactional
-    public User editRole(String id, List<String> roles) throws Exception {
+    public User editRole(String id, List<String> roles, String username, String userrole) throws Exception {
+        logger.info("Start update user role operation by username {} with role {}", username, userrole);
+
         UsersEntity usersEntity = usersRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
 
+        usersEntity.getRoles().clear();
         if (roles != null && !roles.isEmpty()) {
-            usersEntity.getRoles().clear();
             for (String roleName : roles) {
                 RoleTypeEntity role = rolesTypeRepository.findById(roleName)
                         .orElseThrow(() -> new ValidationException("User with email: " + usersEntity.getEmail()
                                 + " role name " + roleName + " not valid"));
 
                 RolesEntity newRole = new RolesEntity();
-                newRole.setIdRoles(UUID.randomUUID().toString());
+                newRole.setUser(usersEntity);
                 newRole.setRoleType(role);
                 usersEntity.addRole(newRole);
             }
         }
 
+        usersEntity.setDateLastUpdate(new Date());
+        usersEntity.setUserIdLastUpdate(username);
+
         UsersEntity usersSaved = usersRepository.save(usersEntity);
-        return convertFromEntityToObject(usersSaved);
+
+        logger.info("Finish update user role operation by username {} with role {}", username, userrole);
+
+        return convertFromEntityToObject(usersSaved, userrole);
     }
 
-    public void deleteUser(String id) throws Exception {
+    public void deleteUser(String id, String username, String userrole) throws Exception {
+        logger.info("Start delete user operation by username {} with role {}", username, userrole);
+
         UsersEntity userLoaded = usersRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
         usersRepository.delete(userLoaded);
+
+        logger.info("Finish delete user operation by username {} with role {}", username, userrole);
     }
 
-    public User getUserById(String id) throws Exception {
-        return usersRepository.findById(id)
-                .map(this::convertFromEntityToObject)
+    public User getUserById(String id, String username, String userrole) throws Exception {
+        logger.info("Start get user by id operation by username {} with role {}", username, userrole);
+
+        User user = usersRepository.findById(id)
+                .map(userEntity -> convertFromEntityToObject(userEntity, userrole))
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id));
+
+        logger.info("Finish get user by id operation by username {} with role {}", username, userrole);
+        return user;
     }
 
-    public List<User> getUserByFilter(UserFilter filter) throws Exception {
+    public List<User> getUserByFilter(UserFilter filter, String username, String userrole) {
+        logger.info("Start get user list by username {} with role {}", username, userrole);
+
         List<UsersEntity> usersEntities = usersRepository.findByFilter(
                 filter.getEmail(),
                 filter.getUsername(),
                 filter.getName(),
                 filter.getSurname(),
-                filter.getTaxcode());
+                filter.getTaxcode(),
+                filter.getRole());
+
+        logger.info("Finish get user list by username {} with role {}", username, userrole);
 
         if(usersEntities != null && !usersEntities.isEmpty()){
             return usersEntities.stream()
-                    .map(this::convertFromEntityToObject)
+                    .map(userEntity -> convertFromEntityToObject(userEntity, userrole))
                     .collect(Collectors.toList());
         }else
             return Collections.emptyList();
     }
 
-    private User convertFromEntityToObject(UsersEntity entity) {
+    private User convertFromEntityToId(UsersEntity entity) {
+        User user = new User();
+        user.setId(entity.getIdUser());
+        return user;
+    }
+
+    private User convertFromEntityToObject(UsersEntity entity, String userrole) {
         User user = new User();
         user.setId(entity.getIdUser());
         user.setEmail(entity.getEmail());
         user.setUsername(entity.getUsername());
         user.setName(entity.getName());
         user.setSurname(entity.getSurname());
-        user.setTaxcode(entity.getTaxCode());
-        if (entity.getRoles() != null) {
+        if(userrole.equalsIgnoreCase("ADMIN"))
+            user.setTaxcode(entity.getTaxCode());
+        if (entity.getRoles() != null && !userrole.equalsIgnoreCase("USER")) {
             user.setRoles(entity.getRoles().stream()
                     .map(RolesEntity::getRoleType)
                     .map(RoleTypeEntity::getRoleName)
@@ -188,18 +233,11 @@ public class UsersService {
         return user;
     }
 
-    public boolean isFieldEditUserEmpty(UserEdit user){
-        return StringUtils.isEmpty(user.getUsername()) &&
-                StringUtils.isEmpty(user.getName()) &&
-                StringUtils.isEmpty(user.getSurname()) &&
-                StringUtils.isEmpty(user.getTaxcode());
-    }
-
     public boolean isFieldUserEmpty(User user){
-        return StringUtils.isEmpty(user.getEmail()) &&
-                StringUtils.isEmpty(user.getUsername()) &&
-                StringUtils.isEmpty(user.getName()) &&
-                StringUtils.isEmpty(user.getSurname()) &&
+        return StringUtils.isEmpty(user.getEmail()) ||
+                StringUtils.isEmpty(user.getUsername()) ||
+                StringUtils.isEmpty(user.getName()) ||
+                StringUtils.isEmpty(user.getSurname()) ||
                 StringUtils.isEmpty(user.getTaxcode());
     }
 

@@ -1,18 +1,27 @@
 package it.alex89.usermgr.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserFilter {
     private String email;
     private String username;
     private String name;
     private String surname;
     private String taxcode;
+    private String role;
 
-    public UserFilter(String email, String username, String name, String surname, String taxcode) {
+    public UserFilter() {
+
+    }
+
+    public UserFilter(String email, String username, String name, String surname, String taxcode, String role) {
         this.email = email;
         this.username = username;
         this.name = name;
         this.surname = surname;
         this.taxcode = taxcode;
+        this.role = role;
     }
 
     public String getEmail() {
@@ -53,5 +62,13 @@ public class UserFilter {
 
     public void setTaxcode(String taxcode) {
         this.taxcode = taxcode;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

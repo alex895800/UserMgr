@@ -9,19 +9,21 @@ import java.util.List;
 
 public interface UsersRepository extends JpaRepository<UsersEntity, String> {
 
-    @Query("SELECT u FROM UsersEntity u WHERE " +
+    @Query("SELECT u FROM UsersEntity u LEFT JOIN u.roles r WHERE " +
             "(:email IS NULL OR :email = '' OR u.email = :email) AND " +
             "(:username IS NULL OR :username = '' OR u.username = :username) AND " +
             "(:name IS NULL OR :name = '' OR u.name = :name) AND " +
             "(:surname IS NULL OR :surname = '' OR u.surname = :surname) AND " +
-            "(:taxcode IS NULL OR :taxcode = '' OR u.taxCode = :taxcode)"
+            "(:taxcode IS NULL OR :taxcode = '' OR u.taxCode = :taxcode) AND" +
+            "(:role IS NULL OR :role = '' OR r.roleType.roleName = :role)"
     )
     List<UsersEntity> findByFilter(
             @Param("email") String email,
             @Param("username") String username,
             @Param("name") String name,
             @Param("surname") String surname,
-            @Param("taxcode") String taxcode
+            @Param("taxcode") String taxcode,
+            @Param("role") String role
     );
 
 

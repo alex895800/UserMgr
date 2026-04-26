@@ -1,0 +1,108 @@
+{
+  "info": {
+    "type": "bruno-environment",
+    "exportedAt": "2026-04-26T09:02:05.235Z",
+    "exportedUsing": "Bruno/v3.3.0"
+  },
+  "environments": [
+    {
+      "name": "Admin",
+      "variables": [
+        {
+          "name": "username",
+          "value": "",
+          "type": "text",
+          "enabled": true,
+          "secret": true
+        },
+        {
+          "name": "password",
+          "value": "",
+          "type": "text",
+          "enabled": true,
+          "secret": true
+        },
+        {
+          "name": "clientId",
+          "value": "",
+          "type": "text",
+          "enabled": true,
+          "secret": true
+        },
+        {
+          "name": "clientSecret",
+          "value": "",
+          "type": "text",
+          "enabled": true,
+          "secret": true
+        }
+      ]
+    },
+    {
+      "name": "Operator",
+      "variables": [
+        {
+          "name": "username",
+          "value": "",
+          "type": "text",
+          "enabled": true,
+          "secret": true
+        },
+        {
+          "name": "password",
+          "value": "",
+          "type": "text",
+          "enabled": true,
+          "secret": true
+        },
+        {
+          "name": "clientId",
+          "value": "",
+          "type": "text",
+          "enabled": true,
+          "secret": true
+        },
+        {
+          "name": "clientSecret",
+          "value": "",
+          "type": "text",
+          "enabled": true,
+          "secret": true
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "variables": [
+        {
+          "name": "username",
+          "value": "",
+          "type": "text",
+          "enabled": true,
+          "secret": true
+        },
+        {
+          "name": "password",
+          "value": "",
+          "type": "text",
+          "enabled": true,
+          "secret": true
+        },
+        {
+          "name": "clientId",
+          "value": "",
+          "type": "text",
+          "enabled": true,
+          "secret": true
+        },
+        {
+          "name": "clientSecret",
+          "value": "",
+          "type": "text",
+          "enabled": true,
+          "secret": true
+        }
+      ]
+    }
+  ]
+}

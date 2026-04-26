@@ -1,0 +1,383 @@
+{
+  "info": {
+    "name": "TestUserApp",
+    "description": "",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Add User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8080/api/users/add",
+          "protocol": "http",
+          "host": [
+            "localhost:8080"
+          ],
+          "path": [
+            "api",
+            "users",
+            "add"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"test.{{mailSuffix}}@gmail.com\",\n  \"username\": \"User{{usernameSuffix}}\",\n  \"name\": \"Alessio\",\n  \"surname\": \"Berrone\",\n  \"taxcode\": \"BRRLSS89H23L219C\",\n  \"roles\": [\n    \"OWNER\",\n    \"OPERATOR\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              "pm.variables.set(\"usernameSuffix\", Math.round(Math.random() * 100000));",
+              "pm.variables.set(\"mailSuffix\", Math.round(Math.random() * 100000));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "FindById",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8080/api/users/{{userId}}",
+          "protocol": "http",
+          "host": [
+            "localhost:8080"
+          ],
+          "path": [
+            "api",
+            "users",
+            "{{userId}}"
+          ],
+          "query": [],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "DeleteUser",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8080/api/users/{{userId}}",
+          "protocol": "http",
+          "host": [
+            "localhost:8080"
+          ],
+          "path": [
+            "api",
+            "users",
+            "{{userId}}"
+          ],
+          "query": [],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "Authentication",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "https://idpgw.test4mind.com/realms/demo-interview/protocol/openid-connect/token",
+          "protocol": "https",
+          "host": [
+            "idpgw",
+            "test4mind",
+            "com"
+          ],
+          "path": [
+            "realms",
+            "demo-interview",
+            "protocol",
+            "openid-connect",
+            "token"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "client_id",
+              "value": "{{clientId}}",
+              "disabled": false,
+              "type": "default"
+            },
+            {
+              "key": "client_secret",
+              "value": "{{clientSecret}}",
+              "disabled": false,
+              "type": "default"
+            },
+            {
+              "key": "scope",
+              "value": "openid profile",
+              "disabled": false,
+              "type": "default"
+            },
+            {
+              "key": "grant_type",
+              "value": "password",
+              "disabled": false,
+              "type": "default"
+            },
+            {
+              "key": "username",
+              "value": "{{username}}",
+              "disabled": false,
+              "type": "default"
+            },
+            {
+              "key": "password",
+              "value": "{{password}}",
+              "disabled": false,
+              "type": "default"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              "let data = pm.response.body;",
+              "pm.variables.set(\"access_token\", data.access_token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "User With filter",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8080/api/users/usersByFilter",
+          "protocol": "http",
+          "host": [
+            "localhost:8080"
+          ],
+          "path": [
+            "api",
+            "users",
+            "usersByFilter"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"\",\n  \"username\": \"\",\n  \"name\": \"\",\n  \"surname\": \"\",\n  \"taxcode\": \"BRRLSS89H23L219C\",\n  \"role\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Edit User",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8080/api/users/{{userId}}",
+          "protocol": "http",
+          "host": [
+            "localhost:8080"
+          ],
+          "path": [
+            "api",
+            "users",
+            "{{userId}}"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"User{{usernameSuffix}}\",\n  \"name\": \"Alessio1\",\n  \"surname\": \"Berrone\",\n  \"taxcode\": \"BRRLSS89H23L219C\",\n  \"roles\": [\n    \"OWNER\",\n    \"OPERATOR\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Edit Role",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}",
+            "disabled": false,
+            "type": "default"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8080/api/users/{{userId}}/role",
+          "protocol": "http",
+          "host": [
+            "localhost:8080"
+          ],
+          "path": [
+            "api",
+            "users",
+            "{{userId}}",
+            "role"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "[\n  \"MAINTAINER\"\n]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "userId",
+      "value": "82218719-0fa2-4bb7-bbee-2426178b914b",
+      "type": "default"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "mailSuffix",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "usernameSuffix",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "clientId",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "clientSecret",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "username",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "password",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "$access_token",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
